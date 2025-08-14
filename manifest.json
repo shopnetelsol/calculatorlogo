@@ -1,0 +1,21 @@
+{
+  "name": "Calculadora Solar - ELSOL",
+  "short_name": "Calc Solar",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#2a6a5a",
+  "description": "Descubra o sistema de energia solar ideal para sua casa ou negócio.",
+  "icons": [
+    {
+      "src": "icons/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

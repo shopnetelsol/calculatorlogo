@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Solar - ELSOL ENERGIA & TECNOLOGIA</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .company-header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #2a6a5a;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .company-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #FFD700;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+        h1 { color: #2a6a5a; margin-bottom: 15px; font-size: 2.2em; }
+        h2 { color: #4a90e2; margin-top: 25px; margin-bottom: 20px; font-size: 1.8em; }
+        h3 { color: #3f7b70; margin-top: 20px; margin-bottom: 10px; font-size: 1.4em; }
+        p { line-height: 1.6; margin-bottom: 10px; }
+        .screen { display: none; animation: fadeIn 0.8s ease-out; }
+        .screen.active { display: block; }
+        .form-group { margin-bottom: 15px; text-align: left; display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        button:hover { background-color: #45a049; }
+        .btn-secondary { background-color: #008CBA; margin-left: 10px; }
+        .btn-secondary:hover { background-color: #007bb5; }
+        .result-option {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .result-option h3 {
+            color: #2a6a5a;
+            border-bottom: 2px solid #a8dadc;
+            padding-bottom: 8px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .contact-buttons { margin-top: 30px; }
+        .contact-buttons a {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .contact-buttons a:hover { background-color: #1DA851; }
+        .contact-buttons a.btn-budget { background-color: #f39c12; }
+        .contact-buttons a.btn-budget:hover { background-color: #e67e22; }
+        ul { list-style-type: disc; text-align: left; padding-left: 20px; margin-top: 15px; }
+        ul li { margin-bottom: 8px; }
+        .info-text { font-size: 0.9em; color: #777; margin-top: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        #solarChart { margin-top: 30px; min-height: 350px; width: 100%; }
+    </style>
+<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2a6a5a">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js');
+      }
+    </script>
+</head>
+<body>
+    <div style="text-align:center; margin-bottom: 20px;"><img src="icons/logo.png" alt="Logo ELSOL" style="width:120px; height:120px; border-radius:15px;"></div>
+<div class="company-header">
+        <h1>ELSOL - ENERGIA & TECNOLOGIA</h1>
+    </div>
+
+    <div class="container">
+        <div id="welcomeScreen" class="screen active">
+            <h1>Descubra Seu Potencial Solar! ☀️</h1>
+            <p>Economize na conta de luz e contribua para um futuro mais sustentável. Nossa calculadora te ajuda a descobrir o sistema de energia solar ideal para sua casa ou negócio.</p>
+            <p class="info-text">Tenha em mãos o consumo dos <strong>últimos 13 meses</strong> para um cálculo mais preciso!</p>
+            <button onclick="showScreen('inputScreen')">Começar Agora</button>
+        </div>
+
+        <div id="inputScreen" class="screen">
+            <h2>Informe Seu Consumo Mensal (kWh)</h2>
+            <p>Preencha o consumo em kWh dos últimos 13 meses.</p>
+            <div id="monthlyInputs" class="form-grid"></div>
+            <button onclick="calculateSolarSystem()">Calcular Meu Sistema</button>
+            <button class="btn-secondary" onclick="showScreen('welcomeScreen')">Voltar</button>
+        </div>
+
+        <div id="resultScreen" class="screen">
+            <h2>Sua Análise Solar Personalizada! 💡</h2>
+            <p>Com base nos seus dados, sua <strong>média de consumo mensal</strong> é de aproximadamente <strong id="averageConsumption"></strong> kWh.</p>
+            <div id="solarChart"></div>
+            <div class="result-option">
+                <h3>Sistema Básico: Economia Imediata 💰</h3>
+                <p><strong>Placas Sugeridas:</strong> <span id="panelsOption1"></span> unidades</p>
+                <p><strong>Geração Estimada:</strong> <span id="generationOption1"></span> kWh/mês</p>
+            </div>
+            <div class="result-option">
+                <h3>Sistema Premium: Conforto e Futuro ✨</h3>
+                <p><strong>Placas Sugeridas:</strong> <span id="panelsOption2"></span> unidades</p>
+                <p><strong>Geração Estimada:</strong> <span id="generation2Text"></span> kWh/mês</p>
+            </div>
+            <h3>Por Que Escolher Energia Solar?</h3>
+            <ul>
+                <li>Economia na conta de luz</li>
+                <li>Valorização do imóvel</li>
+                <li>Sustentabilidade</li>
+                <li>Retorno rápido do investimento</li>
+                <li>Independência energética</li>
+            </ul>
+            <div class="contact-buttons">
+                <p>Gostou? Fale conosco!</p>
+                <a href="https://wa.me/5519997472811" target="_blank">WhatsApp 📲</a>
+                <a href="http://www.elsolsolar.com.br/index" class="btn-budget" target="_blank">Solicitar Orçamento 🛒</a>
+            </div>
+            <button class="btn-secondary" onclick="showScreen('inputScreen')">Refazer Cálculo</button>
+        </div>
+    </div>
+
+    <script>
+        const geracaoPorPlaca = 65;
+        const divisorMedia = 13;
+        const percentualSobra = 0.30;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'inputScreen') generateMonthlyInputs();
+        }
+
+        function generateMonthlyInputs() {
+            const monthlyInputsDiv = document.getElementById('monthlyInputs');
+            monthlyInputsDiv.innerHTML = '';
+            for (let i = 0; i < 13; i++) {
+                const formGroup = document.createElement('div');
+                formGroup.classList.add('form-group');
+                const label = document.createElement('label');
+                label.setAttribute('for', `month_${i}`);
+                label.textContent = `Consumo ${i + 1} (kWh)`;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `month_${i}`;
+                input.min = '0';
+                input.placeholder = 'Ex: 250';
+                input.required = true;
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+                monthlyInputsDiv.appendChild(formGroup);
+            }
+        }
+
+        function calculateSolarSystem() {
+            let totalConsumption = 0;
+            for (let i = 0; i < 13; i++) {
+                const val = parseFloat(document.getElementById(`month_${i}`).value);
+                if (isNaN(val) || val < 0) {
+                    alert('Preencha todos os campos corretamente.');
+                    return;
+                }
+                totalConsumption += val;
+            }
+            const averageMonthlyConsumption = totalConsumption / divisorMedia;
+            document.getElementById('averageConsumption').textContent = averageMonthlyConsumption.toFixed(2);
+            const panelsOption1 = Math.ceil(averageMonthlyConsumption / geracaoPorPlaca);
+            document.getElementById('panelsOption1').textContent = panelsOption1;
+            document.getElementById('generationOption1').textContent = (panelsOption1 * geracaoPorPlaca).toFixed(2);
+            const consumptionWithSobra = averageMonthlyConsumption * (1 + percentualSobra);
+            const panelsOption2 = Math.ceil(consumptionWithSobra / geracaoPorPlaca);
+            document.getElementById('panelsOption2').textContent = panelsOption2;
+            document.getElementById('generation2Text').textContent = (panelsOption2 * geracaoPorPlaca).toFixed(2);
+            Plotly.newPlot('solarChart', [{
+                x: ["Seu Consumo Médio", "Sistema Básico", "Sistema Premium"],
+                y: [averageMonthlyConsumption, panelsOption1 * geracaoPorPlaca, panelsOption2 * geracaoPorPlaca],
+                type: "bar",
+                marker: { color: ['#4a90e2', '#4CAF50', '#f39c12'] }
+            }], { title: "Consumo Médio vs. Geração Sugerida (kWh/mês)", yaxis: { title: 'kWh/mês' }, height: 350 });
+            showScreen('resultScreen');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => showScreen('welcomeScreen'));
+    </script>
+</body>
+</html>
